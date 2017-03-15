@@ -6,12 +6,28 @@ namespace Unibh.Ai.Navigator.Engine.Assets
 {
     public class FieldVision
     {
-        private List<Guide[,]> _guides;
+        private List<Spot[,]> _patterns;
+
+        public Spot[,] this[int index]
+        {
+            get
+            {
+                return _patterns[index];
+            }
+        }
+
+        public int Count
+        {
+            get
+            {
+                return _patterns.Count();
+            }
+        }
 
         public FieldVision(int[,] coordinates)
         {
             var weightMatrix = BuildWeightMatrix(coordinates);
-            _guides = weightMatrix.ToGuideArray().ToList();           
+            _patterns = weightMatrix.ToPatternArray().ToList();
         }
 
         private List<int[,]> BuildWeightMatrix(int[,] coordinates)
@@ -38,7 +54,7 @@ namespace Unibh.Ai.Navigator.Engine.Assets
         {
             var buffer = new StringBuilder();
 
-            foreach (var guide in _guides)
+            foreach (var guide in _patterns)
             {
                 buffer.AppendLine(guide.Draw());
             }

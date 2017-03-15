@@ -54,22 +54,34 @@ namespace Unibh.Ai.Navigator
             return result;
         }
 
-        public static IEnumerable<Guide[,]> ToGuideArray(this List<int[,]> weightMatrix)
+        public static IEnumerable<Spot[,]> ToPatternArray(this List<int[,]> weightMatrix)
         {
             foreach (var weight in weightMatrix)
             {
-                var guideArray = new Guide[weight.GetLength(0), weight.GetLength(1)];
+                var guideArray = new Spot[weight.GetLength(0), weight.GetLength(1)];
 
                 for (int x = 0; x < weight.GetLength(0); x++)
                 {
                     for (int y = 0; y < weight.GetLength(1); y++)
                     {
-                        guideArray[x, y] = new Guide(weight[x, y], new Coordinate(x, y));
+                        guideArray[x, y] = new Spot(weight[x, y], new Coordinate(x, y));
                     }
                 }
 
                 yield return guideArray;
             }
+        }
+
+        public static Spot GetSpotByWeight(this Spot[,] quadrants, int weigth)
+        {
+            return quadrants.OfType<Spot>().FirstOrDefault(x => x.Weight.Equals(weigth));
+        }
+
+        public static Spot CalculateFinalDestination(this Spot[,] quadrants, int value, Spot route)
+        {
+            var spot = quadrants.GetSpotByWeight(value);
+
+            return quadrants[(spot.Coordinate.X + route.Coordinate.X), (spot.Coordinate.Y + route.Coordinate.Y)];
         }
 
         public static string Draw(this LinkedList<Coordinate> path)
@@ -105,11 +117,11 @@ namespace Unibh.Ai.Navigator
             return buffer.ToString();
         }
 
-        public static string Draw(this Guide[,] guide)
+        public static string Draw(this Spot[,] guide)
         {
             var buffer = new StringBuilder();
 
-            var padWidth = guide.OfType<Guide>().Max(g => g.Weight).ToString().Length;
+            var padWidth = guide.OfType<Spot>().Max(g => g.Weight).ToString().Length;
 
             for (int i = 0; i < guide.GetLength(0); i++)
             {
@@ -117,7 +129,10 @@ namespace Unibh.Ai.Navigator
 
                 for (int j = 0; j < guide.GetLength(1); j++)
                 {
-                    buffer.Append(string.Format("| {0} ", guide[i, j].Weight.ToString().PadLeft(padWidth, '\0')));
+                    var weigth = guide[i, j].Weight.ToString().PadLeft(padWidth, '\0');
+                    var x = guide[i, j].Coordinate.X.ToString().PadLeft(padWidth, '\0');
+                    var y = guide[i, j].Coordinate.Y.ToString().PadLeft(padWidth, '\0');
+                    buffer.Append(string.Format("| {0} ", weigth, x, y));
                 }
 
                 buffer.AppendLine("|");
@@ -132,7 +147,7 @@ namespace Unibh.Ai.Navigator
         {
             var buffer = new StringBuilder();
 
-            var padWidth = world.Quadrants.OfType<Spot>().Max(g => g.Value).ToString().Length;
+            var padWidth = world.Quadrants.OfType<Spot>().Max(g => g.Weight).ToString().Length;
 
             for (int i = 0; i < world.Quadrants.GetLength(0); i++)
             {
@@ -140,7 +155,7 @@ namespace Unibh.Ai.Navigator
 
                 for (int j = 0; j < world.Quadrants.GetLength(1); j++)
                 {
-                    buffer.Append(string.Format("| {0} ", world.Quadrants[i, j].Value.ToString().PadLeft(padWidth, '\0')));
+                    buffer.Append(string.Format("| {0} ", world.Quadrants[i, j].Weight.ToString().PadLeft(padWidth, '\0')));
                 }
 
                 buffer.AppendLine("|");

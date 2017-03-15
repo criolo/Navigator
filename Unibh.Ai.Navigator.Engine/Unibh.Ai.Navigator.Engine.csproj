@@ -42,7 +42,6 @@
   <ItemGroup>
     <Compile Include="Assets\Coordinate.cs" />
     <Compile Include="Assets\FieldVision.cs" />
-    <Compile Include="Assets\Guide.cs" />
     <Compile Include="Assets\Spot.cs" />
     <Compile Include="Assets\World.cs" />
     <Compile Include="Extensions\ArrayExtensions.cs" />
